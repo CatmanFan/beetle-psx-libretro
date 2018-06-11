@@ -16,7 +16,8 @@ else ifneq ($(findstring Darwin,$(shell uname -a)),)
 ifeq ($(shell uname -p),powerpc)
    arch = ppc
 endif
-else ifneq ($(findstring MINGW,$(shell uname -a)),)
+else ifneq ($(findstri
+ng MINGW,$(shell uname -a)),)
    platform = win
 endif
 endif
@@ -129,6 +130,7 @@ ifeq ($(HAVE_OPENGL),1)
 	GL_LIB := -lGLESv2
 endif
 
+# PS3 and some others
 else ifeq ($(platform), ps3)
    TARGET := $(TARGET_NAME)_ps3.a
    CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
@@ -179,6 +181,7 @@ else ifeq ($(platform), vita)
    FLAGS += -DHAVE_MKDIR
    STATIC_LINKING = 1
 
+# Xenon?
 else ifeq ($(platform), xenon)
    TARGET := $(TARGET_NAME)_xenon360.a
    CC = xenon-gcc$(EXE_EXT)
@@ -188,6 +191,8 @@ else ifeq ($(platform), xenon)
    LIBS := $(PTHREAD_FLAGS)
    FLAGS += -DHAVE_MKDIR
    STATIC_LINKING = 1
+   
+# Nintendo GameCube
 else ifeq ($(platform), ngc)
    TARGET := $(TARGET_NAME)_ngc.a
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
@@ -198,6 +203,8 @@ else ifeq ($(platform), ngc)
    EXTRA_INCLUDES := -I$(DEVKITPRO)/libogc/include
    FLAGS += -DHAVE_MKDIR
    STATIC_LINKING = 1
+   
+# Nintendo Wii
 else ifeq ($(platform), wii)
    TARGET := $(TARGET_NAME)_wii.a
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
@@ -208,6 +215,23 @@ else ifeq ($(platform), wii)
    EXTRA_INCLUDES := -I$(DEVKITPRO)/libogc/include
    FLAGS += -DHAVE_MKDIR
    STATIC_LINKING = 1
+   
+# Nintendo Switch (libnx)
+else ifeq ($(platform), switch)
+    include $(DEVKITPRO)/libnx/switch_rules
+    EXT=a
+    TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+    DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
+    CFLAGS    :=     $(DEFINES) -g \
+                -O2 \
+                -fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
+    CFLAGS += $(INCDIRS)
+    CFLAGS    +=    $(INCLUDE)  -D__SWITCH__
+    CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -std=gnu++11
+    CFLAGS += -std=gnu11
+    STATIC_LINKING = 1
+
+# useless
 else ifneq (,$(findstring armv,$(platform)))
    TARGET := $(TARGET_NAME).so
    fpic := -fPIC
