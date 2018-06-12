@@ -217,8 +217,13 @@ else ifeq ($(platform), wii)
    
 # Nintendo Switch (libnx)
 else ifeq ($(platform), switch)
+    platform = unix
     include $(DEVKITPRO)/libnx/switch_rules
+    CC = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-gcc
+    CXX = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-g++
+    AR = $(DEVKITPRO)/devkitA64/bin/aarch64-none-elf-ar
     EXT=a
+    fpic := -fPIC
     TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
     DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL -DHAVE_THREADS=1
     CFLAGS    :=     $(DEFINES) -g \
