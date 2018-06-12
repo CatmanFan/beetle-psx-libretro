@@ -16,8 +16,7 @@ else ifneq ($(findstring Darwin,$(shell uname -a)),)
 ifeq ($(shell uname -p),powerpc)
    arch = ppc
 endif
-else ifneq ($(findstri
-ng MINGW,$(shell uname -a)),)
+else ifneq ($(findstring MINGW,$(shell uname -a)),)
    platform = win
 endif
 endif
